@@ -2,6 +2,7 @@ const Response = require("../utils/response");
 const ticketModel = require("../models/tickets");
 const { Op } = require("sequelize");
 const { v4: uuidv4 } = require("uuid");
+const logger = require("../logger");
 class TicketController {
   constructor() {}
 
@@ -54,6 +55,8 @@ class TicketController {
         );
       }
     } catch (err) {
+      console.error("error in placing the ticket", err);
+      logger.error("error in placing the ticket", { error: err });
       res.status(500).send(
         new Response({
           message: "internal server error",
@@ -99,6 +102,7 @@ class TicketController {
       );
     } catch (err) {
       console.log("error in fetching tickets", err);
+      logger.error("error in fetching the ticket", { error: err });
       res.status(500).send(
         new Response({
           message: "internal server error",

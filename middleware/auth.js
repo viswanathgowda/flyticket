@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const Response = require("../utils/response");
+const logger = require("../logger");
 const JWT_SECRET = process.env.JWT_SECRET || "your_secret_key";
 
 class Authenticate {
@@ -45,6 +46,7 @@ class Authenticate {
         );
       }
     } catch (err) {
+      logger.error("error in verifying the auth", { error: err });
       res.status(500).send(
         new Response({
           message: "internal server error at verifying the auth",
@@ -56,19 +58,52 @@ class Authenticate {
     }
   }
 
-  roleAuth(req, res, next) {
+  adminAuth(req, res, next) {
     const user = req.user;
-    console.log("user", user);
     if (["SuperAdmin", "Admin"].includes(user.role)) {
       next();
     } else {
       res.status(403).send(
         new Response({
-          message: "You are not having authority to add new flight.",
+          message: "You are not having authority to do this operation",
           status: "error",
           code: 403,
         })
       );
+    }
+  }
+
+  updateUserAuth(req, res, next) {
+    try {
+      const user = req.user;
+      const updatingData = req.body;
+      if (updatingData?.role) {
+        if (["SuperAdmin", "Admin"].includes(user?.role)) {
+          next();
+        } else {
+          res
+            .status(403)
+            .send(
+              new Response({
+                message: "you are not having authority to update role",
+                status: "success",
+                code: 403,
+              })
+            );
+        }
+      } else {
+        next();
+      }
+    } catch (err) {
+      res
+        .status(500)
+        .send(
+          new Response({
+            message: "Internal Server Error",
+            code: 500,
+            status: "failed",
+          })
+        );
     }
   }
 }

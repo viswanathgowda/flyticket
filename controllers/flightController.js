@@ -1,5 +1,6 @@
 const flightModel = require("../models/flight");
 const Response = require("../utils/response");
+const logger = require("../logger");
 
 class Flight {
   constructor() {}
@@ -31,6 +32,7 @@ class Flight {
       );
     } catch (err) {
       console.error("error in adding new flight", err);
+      logger.error("error in adding new flight", { error: err });
       // Handle unique constraint violation (duplicate flightNo)
       if (err.name === "SequelizeUniqueConstraintError") {
         return res.status(409).send(
