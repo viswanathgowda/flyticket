@@ -55,6 +55,22 @@ class Authenticate {
       );
     }
   }
+
+  roleAuth(req, res, next) {
+    const user = req.user;
+    console.log("user", user);
+    if (["SuperAdmin", "Admin"].includes(user.role)) {
+      next();
+    } else {
+      res.status(403).send(
+        new Response({
+          message: "You are not having authority to add new flight.",
+          status: "error",
+          code: 403,
+        })
+      );
+    }
+  }
 }
 
 module.exports = new Authenticate();
