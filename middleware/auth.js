@@ -81,29 +81,25 @@ class Authenticate {
         if (["SuperAdmin", "Admin"].includes(user?.role)) {
           next();
         } else {
-          res
-            .status(403)
-            .send(
-              new Response({
-                message: "you are not having authority to update role",
-                status: "success",
-                code: 403,
-              })
-            );
+          res.status(403).send(
+            new Response({
+              message: "you are not having authority to update role",
+              status: "success",
+              code: 403,
+            })
+          );
         }
       } else {
         next();
       }
     } catch (err) {
-      res
-        .status(500)
-        .send(
-          new Response({
-            message: "Internal Server Error",
-            code: 500,
-            status: "failed",
-          })
-        );
+      res.status(500).send(
+        new Response({
+          message: "Internal Server Error",
+          code: 500,
+          status: "failed",
+        })
+      );
     }
   }
 }

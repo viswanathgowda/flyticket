@@ -13,7 +13,6 @@ class TicketController {
    */
   async placeTicket(req, res) {
     const user = req.user;
-    console.log("user", user);
     try {
       if (!user) {
         res.status(400).send(

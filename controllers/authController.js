@@ -2,7 +2,9 @@ const userModel = require("../models/user");
 const Response = require("../utils/response");
 const jwt = require("jsonwebtoken");
 const logger = require("../logger");
+const bcrypt = require("bcrypt");
 const JWT_SECRET = process.env.JWT_SECRET || "your_secret_key";
+const BCRYPT_SALT_ROUNDS = process.env.BCRYPT_SALT_ROUNDS;
 
 class Auth {
   constructor(parameters) {}
@@ -10,21 +12,26 @@ class Auth {
   async registerUser(req, res) {
     const { name, email, password, role } = req.body;
     try {
+      const hasedPwd = await bcrypt.hash(
+        password,
+        parseInt(BCRYPT_SALT_ROUNDS)
+      );
       const body = {
         name,
         email,
-        password,
+        password: hasedPwd,
       };
-      if (role) {
-        body.role = role;
-      }
       const result = await userModel.create({ ...body });
-      res.status(200).send(
+      res.status(201).send(
         new Response({
           status: "success",
           message: "User registered successfully",
-          data: result,
-          code: 200,
+          data: {
+            name: result.name,
+            email: result.email,
+            id: result.id,
+          },
+          code: 201,
         })
       );
     } catch (err) {
@@ -122,16 +129,26 @@ class Auth {
       const result = await userModel.findOne({
         where: {
           email: email,
-          password: password,
         },
       });
 
       if (!result) {
         res.status(401).send(
           new Response({
-            message: "invalid credentials",
-            status: "success",
+            message: "invalid email",
+            status: "failed",
             code: 401,
+          })
+        );
+      }
+
+      const isPwdMatched = await bcrypt.compare(password, result.password);
+      if (!isPwdMatched) {
+        return res.status(500).send(
+          new Response({
+            message: "Invalid Credentials",
+            code: 401,
+            status: "failed",
           })
         );
       }
@@ -187,7 +204,7 @@ class Auth {
       res.status(500).send(
         new Response({
           status: "failed",
-          message: "user login failed",
+          message: "internal server error",
           code: 500,
           error: err,
         })
