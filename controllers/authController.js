@@ -1,6 +1,7 @@
 const userModel = require("../models/user");
 const Response = require("../utils/response");
 const jwt = require("jsonwebtoken");
+const logger = require("../logger");
 const JWT_SECRET = process.env.JWT_SECRET || "your_secret_key";
 
 class Auth {
@@ -27,6 +28,8 @@ class Auth {
         })
       );
     } catch (err) {
+      console.error("error in registering user", err);
+      logger.error("error in registering user", { error: err });
       if (err.name === "SequelizeUniqueConstraintError") {
         return res.status(409).send(
           new Response({
@@ -78,6 +81,8 @@ class Auth {
         })
       );
     } catch (err) {
+      console.error("error in updating user", err);
+      logger.error("error in updating user", { error: err });
       if (err.name === "SequelizeUniqueConstraintError") {
         return res.status(409).send(
           new Response({
@@ -178,6 +183,7 @@ class Auth {
       );
     } catch (err) {
       console.error("user login failed", err);
+      logger.error("user failed to login", { error: err });
       res.status(500).send(
         new Response({
           status: "failed",
@@ -212,6 +218,8 @@ class Auth {
       );
     } catch (err) {
       console.error("error while logout", err);
+      logger.error("error while logout", { error: err });
+
       res.status(500).send(
         new Response({
           message: "internal sever error while logout",
@@ -220,6 +228,37 @@ class Auth {
           error: err,
         })
       );
+    }
+  }
+
+  async getAllUsers(req, res) {
+    try {
+      const page = parseInt(req.params.page) || 1;
+      const limit = parseInt(req.params.limit) || 10;
+      const offset = (page - 1) * limit;
+      const result = await userModel.findAndCountAll({
+        limit,
+        offset,
+        order: [["createdAt"]],
+        attributes: ["name", "email", "createdAt"],
+      });
+      const resultData = {
+        currentPage: page,
+        totalPages: Math.ceil(result.count / limit),
+        totalUsers: result.count,
+        userInfo: result,
+      };
+      res.status(200).send(
+        new Response({
+          message: "all users fetched sucessfully",
+          status: "success",
+          code: 200,
+          data: resultData,
+        })
+      );
+    } catch (err) {
+      console.error("error in fetching all users", err);
+      logger.error("error in fetching all users", { error: err });
     }
   }
 }

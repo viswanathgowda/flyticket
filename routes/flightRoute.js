@@ -6,7 +6,7 @@ const authMdlWr = require("../middleware/auth");
 router.post(
   "/addNewFlight",
   authMdlWr.jwtAuth,
-  authMdlWr.roleAuth,
+  authMdlWr.adminAuth,
   flightController.addFlight
 );
 
