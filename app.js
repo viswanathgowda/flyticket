@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 
 const authRoute = require("./routes/authRoute");
 const ticketRoute = require("./routes/ticketRoute");
+const flightRoute = require("./routes/flightRoute");
 
 app.use(express.static("public"));
 
@@ -17,3 +18,4 @@ app.listen(3000, () => {
 
 app.use("/auth", authRoute);
 app.use("/ticket", ticketRoute);
+app.use("/flight", flightRoute);

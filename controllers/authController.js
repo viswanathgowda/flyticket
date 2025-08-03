@@ -7,28 +7,105 @@ class Auth {
   constructor(parameters) {}
 
   async registerUser(req, res) {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
     try {
-      const result = await userModel.create({
+      const body = {
         name,
         email,
         password,
-      });
-      console.log("result", result);
+      };
+      if (role) {
+        body.role = role;
+      }
+      const result = await userModel.create({ ...body });
       res.status(200).send(
         new Response({
           status: "success",
           message: "User registered successfully",
+          data: result,
           code: 200,
         })
       );
     } catch (err) {
+      if (err.name === "SequelizeUniqueConstraintError") {
+        return res.status(409).send(
+          new Response({
+            message: err.errors[0].message || "Duplicate entry",
+            code: 409,
+            status: "fail",
+          })
+        );
+      }
+
+      if (err.name === "SequelizeValidationError") {
+        return res.status(400).send(
+          new Response({
+            message: err.message,
+            code: 400,
+            status: "fail",
+          })
+        );
+      }
       res.status(500).send(
         new Response({
           status: "failed",
           message: "failed to register the user",
           code: 500,
           error: { message: err.errors[0].message },
+        })
+      );
+    }
+  }
+
+  async updateUser(req, res) {
+    try {
+      const updatingData = req.body;
+      const user = req.user;
+      const result = await userModel.update(
+        {
+          ...updatingData,
+        },
+        {
+          where: { id: user.id },
+        }
+      );
+      res.status(200).send(
+        new Response({
+          message: "user updated successfully.",
+          code: 200,
+          status: "success",
+          data: result,
+        })
+      );
+    } catch (err) {
+      if (err.name === "SequelizeUniqueConstraintError") {
+        return res.status(409).send(
+          new Response({
+            message: err.errors[0].message || "Duplicate entry",
+            code: 409,
+            status: "fail",
+          })
+        );
+      }
+
+      if (err.name === "SequelizeValidationError") {
+        return res.status(400).send(
+          new Response({
+            message: err.message,
+            code: 400,
+            status: "fail",
+          })
+        );
+      }
+      res.status(500).send(
+        new Response({
+          status: "failed",
+          message: "failed to update the user",
+          code: 500,
+          error: {
+            message:
+              err?.errors?.[0]?.message || err.message || "Unknown error",
+          },
         })
       );
     }
@@ -73,9 +150,17 @@ class Auth {
         });
       }
       if (!result.token || tknExp) {
-        tkn = jwt.sign({ id: result.id, email: result.email }, JWT_SECRET, {
-          expiresIn: "1hr",
-        });
+        tkn = jwt.sign(
+          {
+            id: result.id,
+            email: result.email,
+            role: `${result?.role ? result?.role : "NA"}`,
+          },
+          JWT_SECRET,
+          {
+            expiresIn: "1hr",
+          }
+        );
         result.token = tkn;
         await result.save();
       }
