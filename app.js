@@ -1,14 +1,23 @@
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
+const cors = require("cors");
 
 const authRoute = require("./routes/authRoute");
 const ticketRoute = require("./routes/ticketRoute");
 const flightRoute = require("./routes/flightRoute");
 
-app.use(express.static("public"));
+app.use(
+  cors({
+    origin: "http://localhost:4200",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
-app.use(bodyParser.json());
+app.use(express.static("public")); // View
+
+app.use(bodyParser.json()); //parses the body to json format
 // Parse application/x-www-form-urlencoded (HTML form submissions)
 app.use(bodyParser.urlencoded({ extended: true }));
 
