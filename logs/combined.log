@@ -1,1 +1,2 @@
 {"error":{"expiredAt":"2025-08-03T05:17:39.000Z","message":"jwt expired","name":"TokenExpiredError"},"level":"error","message":"error in verifying the auth","timestamp":"2025-08-03T05:23:07.208Z"}
+{"error":{},"level":"error","message":"internal server error at register staff","timestamp":"2025-08-10T15:46:37.292Z"}

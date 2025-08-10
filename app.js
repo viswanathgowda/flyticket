@@ -3,9 +3,12 @@ const app = express();
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
+const Database = require("./dbconfig/db");
+
 const authRoute = require("./routes/authRoute");
 const ticketRoute = require("./routes/ticketRoute");
 const flightRoute = require("./routes/flightRoute");
+const staffRoute = require("./routes/staffRoute");
 
 app.use(
   cors({
@@ -28,3 +31,4 @@ app.listen(3000, () => {
 app.use("/auth", authRoute);
 app.use("/ticket", ticketRoute);
 app.use("/flight", flightRoute);
+app.use("/staff", staffRoute);

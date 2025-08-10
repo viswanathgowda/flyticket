@@ -9,7 +9,7 @@ FlyTicket is a simple flight ticket booking system built with Node.js, Express, 
 flyticket/
 │
 ├── config/
-│   └── db.js               # PostgreSQL database connection configuration
+│   └── db.js               # PostgreSQL, Mongoose database connection configuration
 │
 ├── controllers/
 │   ├── AuthController.js   # Handles user registration and login
@@ -34,3 +34,18 @@ flyticket/
 ├── .env                    # Environment variables (PORT, DB credentials, etc.)
 └── package.json            # Project metadata and dependencies
 ```
+
+# MongoDb
+
+| Category        | Example Query to Practice                        |
+| --------------- | ------------------------------------------------ |
+| **Insert**      | `insertOne`, `insertMany` flight logs, reviews   |
+| **Read**        | `find`, `findOne`, projections, filtering        |
+| **Update**      | `$set`, `$push`, `$inc`, `$pull` for nested docs |
+| **Delete**      | `deleteOne`, `deleteMany`                        |
+| **Aggregation** | `$match`, `$group`, `$sort`, `$limit`, `$lookup` |
+| **Indexes**     | Create index on `flightId` or `timestamp`        |
+| **Text Search** | Search flights by review text                    |
+| **Array Ops**   | `$elemMatch`, `$all` for tags/keywords           |
+| **Pagination**  | `.skip()` + `.limit()` queries                   |
+| **Upserts**     | Update or insert if not exists                   |
