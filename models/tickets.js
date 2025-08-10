@@ -1,6 +1,6 @@
 const { DataTypes } = require("sequelize");
 const Database = require("../dbconfig/db");
-const sequelize = Database.getInstance();
+const sequelize = Database.getPostgres();
 
 const Tickets = sequelize.define("tickets", {
   ticketId: {
